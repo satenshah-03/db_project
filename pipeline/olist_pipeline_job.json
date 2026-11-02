@@ -1,0 +1,40 @@
+{
+  "name": "olist medallion pipeline (landing-bronze-silver-gold)",
+  "git_source": {"git_url": "https://github.com/satenshah-03/db_project", "git_provider": "gitHub", "git_branch": "main"},
+  "max_concurrent_runs": 1,
+  "timeout_seconds": 3600,
+  "queue": {"enabled": true},
+  "performance_target": "PERFORMANCE_OPTIMIZED",
+  "email_notifications": {"on_failure": ["<YOUR_EMAIL>"]},
+  "tasks": [
+    {"task_key": "category_name_translation_bronze", "notebook_task": {"notebook_path": "bronze/category name translation bronze", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "customer_bronze_ingestion", "notebook_task": {"notebook_path": "bronze/customer_bronze data ingestion", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "geolocation_bronze_ingestion", "notebook_task": {"notebook_path": "bronze/geolocation_bronze data ingestion", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "order_bronze_ingestion", "notebook_task": {"notebook_path": "bronze/orders_bronze data ingestion", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "orders_items_bronze_ingestion", "notebook_task": {"notebook_path": "bronze/order_items_bronze data ingestion", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "payment_bronze_ingestion", "notebook_task": {"notebook_path": "bronze/payment_bronze data ingestion", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "product_bronze_ingestion", "notebook_task": {"notebook_path": "bronze/product_bronze data ingestion", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "review_bronze_ingestion", "notebook_task": {"notebook_path": "bronze/reviews_bronze data ingestion", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "seller_bronze_ingestion", "notebook_task": {"notebook_path": "bronze/sellers_bronze data ingestion", "source": "GIT"}, "max_retries": 1},
+
+    {"task_key": "category_name_translation_silver", "depends_on": [{"task_key": "category_name_translation_bronze"}], "notebook_task": {"notebook_path": "silver/category name translation silver", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "customer_silver_transformation", "depends_on": [{"task_key": "customer_bronze_ingestion"}], "notebook_task": {"notebook_path": "silver/customer_silver data ingestion", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "geolocation_silver_transformation", "depends_on": [{"task_key": "geolocation_bronze_ingestion"}], "notebook_task": {"notebook_path": "silver/geolocation_silver data ingestion", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "order_silver_transformation", "depends_on": [{"task_key": "order_bronze_ingestion"}], "notebook_task": {"notebook_path": "silver/orders_df_silver data ingestion", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "orders_items_silver_transformation", "depends_on": [{"task_key": "orders_items_bronze_ingestion"}], "notebook_task": {"notebook_path": "silver/order_items_silver data ingestion", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "payment_silver_transformation", "depends_on": [{"task_key": "payment_bronze_ingestion"}], "notebook_task": {"notebook_path": "silver/payment_silver data ingestion", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "product_silver_transformation", "depends_on": [{"task_key": "product_bronze_ingestion"}], "notebook_task": {"notebook_path": "silver/product _silver data ingestion", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "review_silver_transformation", "depends_on": [{"task_key": "review_bronze_ingestion"}], "notebook_task": {"notebook_path": "silver/review_silver data ingestion", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "seller_silver_transformation", "depends_on": [{"task_key": "seller_bronze_ingestion"}], "notebook_task": {"notebook_path": "silver/seller_silver data ingestion", "source": "GIT"}, "max_retries": 1},
+
+    {"task_key": "dim_customer", "depends_on": [{"task_key": "customer_silver_transformation"}], "notebook_task": {"notebook_path": "gold/dim_customer", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "dim_location", "depends_on": [{"task_key": "geolocation_silver_transformation"}], "notebook_task": {"notebook_path": "gold/dim_location", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "dim_date", "depends_on": [{"task_key": "order_silver_transformation"}], "notebook_task": {"notebook_path": "gold/dim_date", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "dim_order", "depends_on": [{"task_key": "order_silver_transformation"}], "notebook_task": {"notebook_path": "gold/dim_orders", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "dim_product", "depends_on": [{"task_key": "product_silver_transformation"}, {"task_key": "category_name_translation_silver"}], "notebook_task": {"notebook_path": "gold/dim_product", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "dim_seller", "depends_on": [{"task_key": "seller_silver_transformation"}], "notebook_task": {"notebook_path": "gold/dim_seller", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "fact_order_items", "depends_on": [{"task_key": "orders_items_silver_transformation"}, {"task_key": "order_silver_transformation"}, {"task_key": "customer_silver_transformation"}], "notebook_task": {"notebook_path": "gold/fact_order_items", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "fact_payment", "depends_on": [{"task_key": "payment_silver_transformation"}, {"task_key": "order_silver_transformation"}, {"task_key": "customer_silver_transformation"}], "notebook_task": {"notebook_path": "gold/fact_payment", "source": "GIT"}, "max_retries": 1},
+    {"task_key": "fact_review", "depends_on": [{"task_key": "review_silver_transformation"}, {"task_key": "order_silver_transformation"}, {"task_key": "customer_silver_transformation"}], "notebook_task": {"notebook_path": "gold/fact_review", "source": "GIT"}, "max_retries": 1}
+  ]
+}

@@ -42,7 +42,8 @@ The code references the original author's environment. Replace these with your o
 6. `gold/` facts: `fact_order_items`, `fact_payment`, `fact_review`
 7. `analytics/Analytics`
 
-Tip: create a Lakeflow Job with one notebook task per file and dependencies following the order above.
+Tip: a ready-to-import Lakeflow Job definition (27 tasks, runs notebooks straight from this repo) is in
+`pipeline/olist_pipeline_job.json`. See `docs/PIPELINE_ANALYSIS.md` for the pipeline analysis and setup steps.
 
 ## Known data quirks
 
